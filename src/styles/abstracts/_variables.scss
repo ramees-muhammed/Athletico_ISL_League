@@ -1,0 +1,26 @@
+:root {
+  /* Brand Colors */
+  --color-red: #ED1C24;
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-gray-light: #F8F9FA;
+  --color-gray-medium: #E9ECEF;
+  --color-danger: #e74c3c;
+
+  /* Typography */
+  --font-heading: 'Bebas Neue', sans-serif;
+  --font-content: 'Inter', sans-serif;
+
+  /* Font Sizes */
+  --fs-hero: 4rem;
+  --fs-h2: 2.2rem;
+  --fs-body: 1rem;
+  --fs-small: 0.85rem;
+
+  /* Transitions & Radius */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
