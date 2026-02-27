@@ -34,7 +34,7 @@ const RegisterPage = () => {
       .matches(/^[0-9]{10}$/, "10 digits required")
       .required("Required"),
     place: Yup.string().required("Required"),
-    age: Yup.number().min(10).max(60).required("Required"),
+    // age: Yup.number().min(10).max(60).required("Required"),
     club: Yup.string().required("Required"),
     position: Yup.string().required("Required"),
   });
@@ -44,7 +44,7 @@ const RegisterPage = () => {
       fullname: "",
       phone: "",
       place: "",
-      age: "",
+      // age: "",
       club: "",
       position: "FW" as any,
       facePhoto: null as File | null,
@@ -62,7 +62,7 @@ const RegisterPage = () => {
       setIsSubmitting(true);
 
 try {
-        // 2. New Cloudinary Upload Function
+        //  New Cloudinary Upload Function
         const uploadToCloudinary = async (file: File) => {
           const formData = new FormData();
           formData.append("file", file);
@@ -88,7 +88,7 @@ try {
           fullname: values.fullname,
           phone: values.phone,
           place: values.place,
-          age: Number(values.age),
+          // age: Number(values.age),
           club: values.club,
           position: values.position,
           facePhotoUrl: faceUrl,
@@ -150,21 +150,15 @@ try {
               error={formik.errors.phone}
               touched={formik.touched.phone}
             />
-            <Input
-              label="Age"
-              type="number"
-              {...formik.getFieldProps("age")}
-              error={formik.errors.age}
-              touched={formik.touched.age}
-            />
-          </div>
-
+        
           <Input
             label="Place"
             {...formik.getFieldProps("place")}
             error={formik.errors.place}
             touched={formik.touched.place}
           />
+          </div>
+
 
           <div className="input-row">
             <Input
@@ -219,7 +213,7 @@ try {
             {/* Closing Face Photo Card properly */}
             {/* Full Body Photo Card */}
             <div className={`upload-card ${fullPreview ? "has-image" : ""}`}>
-              <label>Full Body Photo</label>
+              <label>Normal Photo</label>
               <div className="preview-container">
                 {fullPreview ? (
                   <>

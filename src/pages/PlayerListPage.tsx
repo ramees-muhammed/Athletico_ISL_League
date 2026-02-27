@@ -1,40 +1,63 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, RotateCcw, Trash2 } from 'lucide-react'; // npm install lucide-react
+import { Check, RotateCcw, Trash2 } from 'lucide-react'; 
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAdmin } from '../context/AdminContext';
 import { pageTransition } from '../utils/motion';
 import Modal from '../components/ui/Modal/Modal';
-import './PlayerListPage.scss';
 
-const DUMMY_PLAYERS = [
-  { id: '1', fullname: 'Davis', position: 'FW', club: 'Athletico Valaparamb', place: 'Kochi', age: 24, status: 'Success', facePhotoUrl: 'https://i.pravatar.cc/150?u=1', fullPhotoUrl: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=500', createdAt: Date.now() },
-  { id: '2', fullname: 'Lionel Messi', position: 'FW', club: 'Inter Miami', place: 'Miami', age: 36, status: 'Success', facePhotoUrl: 'https://i.pravatar.cc/150?u=2', fullPhotoUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500', createdAt: Date.now() },
-];
+
+import './PlayerListPage.scss';
+import { fetchPlayersAxios } from '../hooks/usePlayers';
+import { deletePlayerAxios, updatePlayerStatusAxios } from '../api/playerApi';
 
 const PlayerListPage = () => {
   const { isAdmin } = useAdmin();
+  const queryClient = useQueryClient();
   const [activeCard, setActiveCard] = useState<string | null>(null);
-  
-  // State for Demo (In production, use your Firebase fetching logic)
-  const [players, setPlayers] = useState(DUMMY_PLAYERS);
+
+  // 1. Fetch Players with TanStack Query
+  const { data: players = [], isLoading, isError, error } = useQuery({
+    queryKey: ['players'],
+    queryFn: fetchPlayersAxios,
+    staleTime: 1000 * 60 * 5, 
+  });
+
+  // 2. Mutation for Status Toggle
+  const statusMutation = useMutation({
+    mutationFn: updatePlayerStatusAxios,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+    },
+  });
+
+  // 3. Mutation for Deletion
+  const deleteMutation = useMutation({
+    mutationFn: deletePlayerAxios,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+      setDeleteModal({ open: false, id: null });
+    },
+  });
+
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; id: string | null }>({
     open: false,
     id: null,
   });
 
-  const handleToggleStatus = (id: string) => {
-    setPlayers(prev => prev.map(p => 
-      p.id === id ? { ...p, status: p.status === 'Pending' ? 'Success' : 'Pending' } : p
-    ));
-    // Would you like the Firebase updateDoc logic for this?
+  const handleToggleStatus = (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'Pending' ? 'Success' : 'Pending';
+    statusMutation.mutate({ id, newStatus });
   };
 
   const handleDeleteConfirm = () => {
     if (deleteModal.id) {
-      setPlayers(prev => prev.filter(p => p.id !== deleteModal.id));
-      setDeleteModal({ open: false, id: null });
+      deleteMutation.mutate(deleteModal.id);
     }
   };
+
+  if (isLoading) return <div className="loader">Loading Athletico Squad...</div>;
+  if (isError) return <div className="error">Error: {(error as any).message}</div>;
 
   return (
     <motion.div {...pageTransition} className="player-list-wrapper">
@@ -66,7 +89,7 @@ const PlayerListPage = () => {
                 <td>{p.club}</td>
                 <td><span className={`tag ${p.position}`}>{p.position}</span></td>
                 <td>
-                  <span className={`status-badge ${p.status.toLowerCase()}`}>
+                  <span className={`status-badge ${p.status?.toLowerCase()}`}>
                     {p.status}
                   </span>
                 </td>
@@ -74,13 +97,14 @@ const PlayerListPage = () => {
                   <td className="action-cells">
                     <button 
                       className={`action-btn ${p.status === 'Pending' ? 'accept' : 'revert'}`}
-                      onClick={() => handleToggleStatus(p.id)}
+                      disabled={statusMutation.isPending}
+                      onClick={() => handleToggleStatus(p.id!, p.status)}
                     >
                       {p.status === 'Pending' ? <Check size={18} /> : <RotateCcw size={18} />}
                     </button>
                     <button 
                       className="action-btn delete"
-                      onClick={() => setDeleteModal({ open: true, id: p.id })}
+                      onClick={() => setDeleteModal({ open: true, id: p.id || null })}
                     >
                       <Trash2 size={18} />
                     </button>
@@ -92,14 +116,14 @@ const PlayerListPage = () => {
         </table>
       </div>
 
-      {/* --- MOBILE VIEW --- */}
+      {/* --- MOBILE VIEW (Exact Layout Logic) --- */}
       <div className="mobile-container">
         <div className="card-stack">
           {players.map((p) => (
             <motion.div
               layoutId={`card-${p.id}`}
               key={p.id}
-              onClick={() => setActiveCard(activeCard === p.id ? null : p.id)}
+              onClick={() => p.id && setActiveCard(activeCard === p.id ? null : p.id)}
               className={`expandable-card ${activeCard === p.id ? 'expanded' : ''}`}
             >
               <div className="card-header-small">
@@ -107,7 +131,7 @@ const PlayerListPage = () => {
                 <div className="header-info">
                   <motion.h3 layoutId={`name-${p.id}`}>{p.fullname}</motion.h3>
                   <div className="header-tags">
-                    <span className={`status-badge mini ${p.status.toLowerCase()}`}>{p.status}</span>
+                    <span className={`status-badge mini ${p.status?.toLowerCase()}`}>{p.status}</span>
                     <p>{p.club}</p>
                   </div>
                 </div>
@@ -115,11 +139,16 @@ const PlayerListPage = () => {
 
               <AnimatePresence>
                 {activeCard === p.id && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="expanded-content">
-                    <img src={p.fullPhotoUrl} className="full-view-img" />
+                  <motion.div 
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    exit={{ opacity: 0 }} 
+                    className="expanded-content"
+                  >
+                    <img src={p.fullPhotoUrl} className="full-view-img" alt="Full View" />
                     <div className="stats-row">
                       <p><span>Position:</span> {p.position}</p>
-                      <p><span>Age:</span> {p.age}</p>
+                      {/* <p><span>Age:</span> {p.age}</p> */}
                       <p><span>Place:</span> {p.place}</p>
                     </div>
 
@@ -127,14 +156,21 @@ const PlayerListPage = () => {
                       <div className="mobile-admin-actions">
                         <button 
                           className={`mobile-btn ${p.status === 'Pending' ? 'accept' : 'revert'}`}
-                          onClick={(e) => { e.stopPropagation(); handleToggleStatus(p.id); }}
+                          disabled={statusMutation.isPending}
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            handleToggleStatus(p.id!, p.status); 
+                          }}
                         >
-                          {p.status === 'Pending' ? <Check size={20} /> : <RotateCcw size={20} />}
-                          {p.status === 'Pending' ? 'Approve Player' : 'Set to Pending'}
+                           {p.status === 'Pending' ? <Check size={20} /> : <RotateCcw size={20} />}
+                           {p.status === 'Pending' ? 'Approve Player' : 'Set to Pending'}
                         </button>
                         <button 
                           className="mobile-btn delete"
-                          onClick={(e) => { e.stopPropagation(); setDeleteModal({ open: true, id: p.id }); }}
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setDeleteModal({ open: true, id: p.id || null }); 
+                          }}
                         >
                           <Trash2 size={20} />
                           Remove Player
@@ -156,12 +192,15 @@ const PlayerListPage = () => {
         title="Remove Player"
         message="This will permanently delete the player from the database. Are you sure?"
         confirmText="Delete Now"
+        isLoading={deleteMutation.isPending}
       />
     </motion.div>
   );
 };
 
 export default PlayerListPage;
+
+
 // import  { useEffect, useId, useRef, useState } from "react";
 // import { AnimatePresence, motion } from "framer-motion";
 

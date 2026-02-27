@@ -7,7 +7,7 @@ id?: string;
 fullname: string;
 phone: string;
 place: string;
-age: number;
+// age: number;
 club: string;
 position : PlayerPosition;
 status: RegistrationStatus;

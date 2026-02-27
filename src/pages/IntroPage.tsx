@@ -36,7 +36,7 @@ const IntroPage = () => {
           animate={{ letterSpacing: "2px", opacity: 1 }}
           transition={{ duration: 1 }}
         >
-          ATHLETICO <span>VALAPARAMB</span>
+          Irumbuzhi <span>Soccer League</span>
         </motion.h1>
 
         {/* Live Counter Display */}

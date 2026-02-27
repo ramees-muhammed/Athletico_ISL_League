@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../../context/AdminContext';
 import './Navbar.scss';
 import Modal from '../ui/Modal/Modal';
+import { LayoutDashboard, Users } from 'lucide-react';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -22,31 +23,39 @@ const Navbar = () => {
       <div className="nav-container">
         <div className="nav-logo" onClick={() => navigate('/')}>
           <img src="/athletico_logo.jpeg" alt="Athletico" />
-          <span className="logo-text">ATHLETICO <span>VPM</span></span>
+          {/* <span className="logo-text">ATHLETICO <span>VPM</span></span> */}
         </div>
         
-        <div className="nav-actions">
-          <button className="nav-link" onClick={() => navigate('/players')}>
-            Player Lists
-          </button>
-          
-          {isAdmin ? (
-            <div className="admin-group">
-              <span className="admin-indicator">Admin Mode</span>
-              {/* Trigger the modal instead of calling logout immediately */}
-              <button 
-                onClick={() => setIsLogoutModalOpen(true)} 
-                className="btn-auth logout"
-              >
-                LOGOUT
-              </button>
-            </div>
-          ) : (
-            <button onClick={() => navigate('/admin-login')} className="btn-auth login">
-              ADMIN
-            </button>
-          )}
-        </div>
+     <div className="nav-actions">
+  {/* Modern Icon Button for Player List */}
+  <button 
+    className="icon-nav-btn" 
+    onClick={() => navigate('/players')}
+    title="Player Lists"
+  >
+    <Users size={22} strokeWidth={1.5} /> 
+    <span className="icon-label">PLAYERS</span>
+  </button>
+
+  {isAdmin ? (
+    <div className="admin-group">
+      <div className="admin-badge">
+        <LayoutDashboard size={14} />
+        <span>ADMIN</span>
+      </div>
+      <button 
+        onClick={() => setIsLogoutModalOpen(true)} 
+        className="btn-auth logout"
+      >
+        LOGOUT
+      </button>
+    </div>
+  ) : (
+    <button onClick={() => navigate('/admin-login')} className="btn-auth login">
+      ADMIN LOGIN
+    </button>
+  )}
+</div>
       </div>
 
       {/* Logout Confirmation Modal */}
