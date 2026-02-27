@@ -11,8 +11,8 @@ age: number;
 club: string;
 position : PlayerPosition;
 status: RegistrationStatus;
-facePhotoUrl: string;
-fullPhotoUrl: string;
+facePhotoUrl?: string;
+fullPhotoUrl?: string;
 createdAt: number;
 
 };

@@ -1,0 +1,89 @@
+/* Navbar.scss */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 80px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
+
+  .nav-container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    
+    img { height: 50px; border-radius: 50%; }
+    .logo-text {
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      span { color: var(--color-red); }
+    }
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    .nav-link {
+      background: none;
+      border: none;
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: var(--color-black);
+      &:hover { color: var(--color-red); }
+    }
+
+    .admin-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      .admin-indicator {
+        font-size: 0.7rem;
+        background: #000;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        text-transform: uppercase;
+      }
+    }
+
+    .btn-auth {
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      
+      &.login {
+        background: var(--color-black);
+        color: var(--color-white);
+        &:hover { background: var(--color-red); }
+      }
+      
+      &.logout {
+        background: transparent;
+        border: 2px solid var(--color-red);
+        color: var(--color-red);
+        &:hover { background: var(--color-red); color: white; }
+      }
+    }
+  }
+}

@@ -1,71 +1,82 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-
+import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
-// import { useAdmin } from '../context/AdminContext';
+import { useAdmin } from '../context/AdminContext';
 import { pageTransition } from '../utils/motion';
-
-import './AdminLoginPage.scss';
 import Input from '../components/ui/Input/Input';
 import Button from '../components/ui/Button/Button';
+import './AdminLoginPage.scss';
+import Toast from '../components/ui/Toaster/Toast';
 
 const AdminLoginPage = () => {
-  // const navigate = useNavigate();
-  // const { login } = useAdmin();
+  const navigate = useNavigate();
+  const { login } = useAdmin();
+  
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; isVisible: boolean }>({
+    message: '',
+    type: 'success',
+    isVisible: false,
+  });
 
-  setIsLoggingIn(true)
-  // Validation Schema
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type, isVisible: true });
+  };
+
   const validationSchema = Yup.object({
-    idNumber: Yup.string()
-      .min(3, "ID must be at least 3 characters")
-      .required("Admin ID is required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
+    idNumber: Yup.string().required("Admin ID is required"),
+    password: Yup.string().required("Password is required"),
   });
 
   const formik = useFormik({
-    initialValues: {
-      idNumber: '',
-      password: '',
-    },
+    initialValues: { idNumber: '', password: '' },
     validationSchema,
     onSubmit: async (values) => {
-      console.log(values);
+      setIsLoggingIn(true);
       
-      // setIsLoggingIn(true);
-      
-      // // Artificial delay for premium UX feedback
-      // setTimeout(() => {
-      //   const success = login(values.idNumber, values.password);
-      //   if (success) {
-      //     navigate('/players');
-      //   } else {
-      //     alert("Access Denied: Invalid Credentials");
-      //   }
-      //   setIsLoggingIn(false);
-      // }, 1200);
+      // Simulate premium delay
+      setTimeout(() => {
+        const success = login(values.idNumber, values.password);
+        
+        if (success) {
+          showToast("Login Successful! Welcome, Admin.", "success");
+          // Small delay so they see the success toast before the page slides away
+          setTimeout(() => {
+            navigate('/players');
+          }, 1500);
+        } else {
+          showToast("Access Denied: Invalid Credentials", "error");
+          setIsLoggingIn(false);
+        }
+      }, 1000);
     },
   });
 
   return (
     <motion.div {...pageTransition} className="admin-login-container">
+      <Toast 
+        isVisible={toast.isVisible} 
+        message={toast.message} 
+        type={toast.type} 
+        onClose={() => setToast({ ...toast, isVisible: false })} 
+      />
+
       <div className="login-card">
         <header>
           <div className="logo-shield">
              <img src="/images/home_page_img.jpeg" alt="Athletico Logo" />
           </div>
           <h2>ADMIN <span>PORTAL</span></h2>
-          <p>Please enter your credentials to manage the league</p>
+          <p>Enter <strong>admin123</strong> / <strong>athletico2026</strong> to test</p>
         </header>
 
         <form onSubmit={formik.handleSubmit} noValidate>
           <Input 
             label="Admin ID Number" 
-            placeholder="e.g. ADM-101"
+            placeholder="admin123"
             {...formik.getFieldProps('idNumber')}
             error={formik.errors.idNumber}
             touched={formik.touched.idNumber}
@@ -74,7 +85,7 @@ const AdminLoginPage = () => {
           <Input 
             label="Password" 
             type="password"
-            placeholder="••••••••"
+            placeholder="athletico2026"
             {...formik.getFieldProps('password')}
             error={formik.errors.password}
             touched={formik.touched.password}
@@ -84,15 +95,10 @@ const AdminLoginPage = () => {
             type="submit" 
             isLoading={isLoggingIn} 
             variant="primary"
-            className="login-submit-btn"
           >
             Authorize Access
           </Button>
         </form>
-        
-        <div className="login-footer">
-          <p>Restricted Area: Authorized Personnel Only</p>
-        </div>
       </div>
     </motion.div>
   );
