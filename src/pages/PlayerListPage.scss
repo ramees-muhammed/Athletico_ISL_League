@@ -64,7 +64,9 @@
     justify-content: center;
     margin-bottom: 2.5rem;
     width: 100%; // Ensure it respects parent width
-    
+    @media (max-width:768px) {
+      margin-bottom: 0px;
+    }
 
     .status-filter-tabs {
       display: inline-flex;
@@ -148,6 +150,59 @@
           .count-badge {
             background: rgba(194, 34, 34, 0.2);
           }
+        }
+      }
+    }
+
+.download-pdf-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--color-dark, #222);
+      color: var(--color-white, #fff);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+
+      /* Desktop Hover */
+      &:hover:not(:disabled) {
+        background: var(--color-red, #e74c3c);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(237, 28, 36, 0.25);
+      }
+
+      &:disabled {
+        background: var(--color-gray-medium, #ccc);
+        color: #888;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+      }
+
+      /* --- MOBILE PREMIUM FLOATING BOTTOM BUTTON --- */
+      @media (max-width: 768px) {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 32px); /* Full width with 16px margins */
+        max-width: 350px;
+        justify-content: center; /* Center the icon and text */
+        padding: 14px 20px;
+        border-radius: 100px; /* Pill shape for modern app feel */
+        font-size: 1rem;
+        z-index: 100; /* Stays above the scrolling player cards */
+
+
+        /* Prevent the translateX(-50%) from breaking on hover */
+        &:hover:not(:disabled) {
+          transform: translateX(-50%) translateY(-2px);
         }
       }
     }
