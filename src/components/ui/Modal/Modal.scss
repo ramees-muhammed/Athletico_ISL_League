@@ -82,8 +82,10 @@
 
     // Target the custom Button components
     button {
-      padding: 0.8rem;
+      // padding: 0.8rem;
+      padding: 0px 10px;
       font-size: 1.1rem;
+      text-wrap: nowrap;
     }
   }
 }

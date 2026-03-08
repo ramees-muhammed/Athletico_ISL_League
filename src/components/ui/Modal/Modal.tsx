@@ -10,7 +10,8 @@ interface ModalProps {
   title: string;
   message: string;
   isLoading?: boolean;
-  confirmText?: string; // Add this optional prop
+  confirmText?: string; 
+  isAlert?:boolean;
 }
 
 const Modal: React.FC<ModalProps> = ({ 
@@ -20,7 +21,8 @@ const Modal: React.FC<ModalProps> = ({
   title, 
   message, 
   isLoading,
-  confirmText = "Confirm" // Set a default value
+  confirmText = "Confirm" ,// Set a default value
+  isAlert = false
 }) => {
   return (
     <AnimatePresence>
@@ -50,12 +52,20 @@ const Modal: React.FC<ModalProps> = ({
               <p>{message}</p>
             </div>
 
-            <div className="modal-actions">
-              <Button variant="primary" onClick={onClose} disabled={isLoading}>
-                Cancel
-              </Button>
-              <Button variant="danger" onClick={onConfirm} isLoading={isLoading}>
-                {confirmText} {/* Use the dynamic prop here */}
+          <div className="modal-actions">
+              {/* Hide Cancel button if it's just an alert */}
+              {!isAlert && (
+                <Button variant="primary" onClick={onClose} disabled={isLoading}>
+                  Cancel
+                </Button>
+              )}
+              {/* Change color to primary if alert, keep danger if confirmation */}
+              <Button 
+                variant={isAlert ? "primary" : "danger"} 
+                onClick={onConfirm} 
+                isLoading={isLoading}
+              >
+                {confirmText} 
               </Button>
             </div>
           </motion.div>
